@@ -1,1 +1,19 @@
+SELECT
+    se.name AS "Stock Entry ID:Link/Stock Entry:150",
+    se.posting_date AS "Date:Date:100",
+    se.stock_entry_type AS "Entry Type::120",
+    se_item.item_code AS "Item Code:Link/Item:150",
+    se_item.item_name AS "Item Name::200",
+    se_item.uom AS "UOM:Link/UOM:80",
+    se_item.qty AS "Quantity:Float:100",
+    se_item.s_warehouse AS "Warehouse:Link/Warehouse:180",
+    se.remarks AS "Reason::200"
+FROM
+    `tabStock Entry` se
+JOIN
+    `tabStock Entry Detail` se_item ON se.name = se_item.parent
+WHERE
+    se.stock_entry_type = 'Wastage Entry'
+ORDER BY
+    se.posting_date DESC, se.name DESC
 
