@@ -1,0 +1,47 @@
+SELECT
+    pi.name AS "POS Invoice:Link/POS Invoice:200",
+    pi.customer AS "Customer:Link/Customer:120",
+    pi.posting_date AS "Date",
+    DATE_FORMAT(pi.posting_time, '%%H:%%i:%%s') AS "Time",
+    pi.pos_profile AS "POS Profile:Link/POS Profile:150",
+    pi.owner AS "POS User:Link/User:150",
+    CASE 
+        WHEN pi.set_warehouse = 'Stores - OAC' THEN 'OAC MCT INTL AIRPORT 1 - OAC'
+        ELSE pi.set_warehouse
+    END AS "Outlet:Link/Warehouse:200",
+    ROUND(pi.total_qty, 2) AS "Total Qty:Float:100",
+    pi.grand_total AS "Grand Total:Currency",
+    'Submitted' AS "Status:180"
+FROM
+    `tabPOS Invoice` pi
+WHERE
+    pi.docstatus = 1
+    AND (
+        (%(start_date)s IS NULL OR pi.posting_date >= %(start_date)s)
+        AND (%(end_date)s IS NULL OR pi.posting_date <= %(end_date)s)
+    )
+
+UNION ALL
+
+SELECT
+    'Total' AS "POS Invoice:Link/POS Invoice:200",
+    '' AS "Customer:Link/Customer:120",
+    '' AS "Date",
+    '' AS "Time",
+    '' AS "POS Profile:Link/POS Profile:150",
+    '' AS "POS User:Link/User:150",
+    '' AS "Warehouse:Link/Warehouse:120",
+    ROUND(SUM(pi.total_qty), 2) AS "Total Qty:Float:100",
+    SUM(pi.grand_total) AS "Grand Total:Currency",
+    '' AS "Status:180"
+FROM
+    `tabPOS Invoice` pi
+WHERE
+    pi.docstatus = 1
+    AND (
+        (%(start_date)s IS NULL OR pi.posting_date >= %(start_date)s)
+        AND (%(end_date)s IS NULL OR pi.posting_date <= %(end_date)s)
+    )
+
+ORDER BY
+    "Date" DESC, "Time" DESC;
